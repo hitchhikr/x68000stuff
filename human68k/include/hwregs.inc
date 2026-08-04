@@ -1,5 +1,5 @@
 ; =================================================================================
-; X68000 Hardware registers constants and memory locations v1.2.
+; X68000 Hardware registers constants and memory locations v1.3.
 ; Painstakingly translated & typed by Franck 'hitchhikr' Charlet.
 ; =================================================================================
 
@@ -510,7 +510,8 @@ GFX_PRI             equ     $E82500
 ;   0 = off
 ;   (When the graphic size is 1024 * 1024 dots)
 ;
-; bit 3-0: GS3-GS0 Graphic screen control (relative to GPx)
+; bit 3-0: GS3-GS0 Graphic screen control
+;          (select the pages prorities to display set in GFX_PRI)
 ;
 ;   1 = on
 ;   0 = off
@@ -518,7 +519,7 @@ GFX_PRI             equ     $E82500
 ;
 ; * If the graphic screen is one page, set the same value to each bit of GS3 to GS0.
 ;   Also, if the graphic screen is two pages, treat GS3 to GS2/GS1 to GS0 as one set,
-;   and set each bit of the same set to the same value. are all set to the same value.
+;   and set each bit of the same set to the same value.
 ;
 GFX_EN              equ     $E82600
 ;
@@ -836,13 +837,13 @@ EXT_AREA_SET_REG_4  equ     $EAFF89         ; 1.b                            4($
 ;
 ; The multi-function peripheral MC68901 is a 4 timer, 1 channel serial
 ; Alport (USART) has an 8-bit general-purpose I/O port (GPIP).
-; The allocation for X680x0/Human68k is as follows.
-; Timer A Interrupt by V-DISP (vertical display period) signal
-; Timer B Serial port clock generation
-; Timer C Cursor blinking/FDD control, etc. interrupt
-; Timer D BG Interrupt for process switching
-; Serial port keyboard input/output
-; General-purpose I/O port Interrupts by various signals
+; The allocation for X680x0/Human68k is as follows:
+; - Timer A Interrupt by V-DISP (vertical display period) signal
+; - Timer B Serial port clock generation
+; - Timer C Cursor blinking/FDD control, etc. interrupt
+; - Timer D BG Interrupt for process switching
+; - Serial port keyboard input/output
+; - General-purpose I/O port Interrupts by various signals
 ;
 ; bit 7: H-SYNC CRTC H-SYNC signal
 ;
@@ -2508,8 +2509,8 @@ BG1_Y               equ     $EB0806
 ;
 ; bit 9:
 ;
-;   1 = display sprites
-;   0 = allow CPU to fully access the VRAM
+;   1 = Display sprites and BGx
+;   0 = Allow CPU to fully access the VRAM
 ;       (mainly to be used during VBLANK)
 ;
 ; bit 4-5:
@@ -2566,7 +2567,7 @@ SCREEN_SET_RES      equ     $EB0810         ; Resolution settings
 ;
 ; Format of PCG is 4 bit chunky
 ;
-; Format of BGx is the same as SPR_INF
+; Format of BGx is the same as SPR_INF (See above)
 ;
 PCG_DATA            equ     $EB8000         ; PCG data (16x16 / 8x8) (16k) (Shared PCG area) (r/w)
 BG0_DATA            equ     $EBC000         ; BG0 tiles offsets (8k) (r/w)
