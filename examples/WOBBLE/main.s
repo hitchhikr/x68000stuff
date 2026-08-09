@@ -1,6 +1,6 @@
 ; =======================================================
 ; Wobble
-; A 508 bytes effect for the X68000.
+; A 506 bytes effect for the X68000.
 ; Written by Franck 'hitchhikr' Charlet.
 ; NOTE: NO EMULATOR CAN RENDER THIS PROPERLY
 ;       DUE TO THE SPRITES BEING RELOADED AT EACH LINE !

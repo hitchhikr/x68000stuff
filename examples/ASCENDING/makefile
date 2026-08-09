@@ -5,8 +5,9 @@ CC = $(XSDK)/bin/human68k-gcc
 AS = $(XSDK)/bin/vasm
 RM = $(XSDK)/bin/rm
 OBJCOPY	= $(XSDK)/bin/human68k-objcopy
+STRIP = $(XSDK)/bin/stripx
 CFLAGS = -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments -nostartfiles
+LDFLAGS = -Wl,--no-warn-rwx-segments -nostartfiles
 LIBS = 
 
 .c.o:
@@ -16,11 +17,11 @@ LIBS =
 
 files = main.o
 
-all: ASCEND.R
+all: ASCEND
 
-ASCEND.R: $(files)
+ASCEND: $(files)
 	$(CC) $(LDFLAGS) -o $@ $(files) $(LIBS)
-	$(OBJCOPY) -O binary $@ $@
+	$(OBJCOPY) -O binary $@ $@.R
 
 clean:
-	-$(RM) $(files)
+	-$(RM) $(files) ASCEND

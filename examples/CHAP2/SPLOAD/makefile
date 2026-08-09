@@ -4,13 +4,13 @@ endif
 CC = $(XSDK)/bin/human68k-gcc
 AS = $(XSDK)/bin/vasm
 RM = $(XSDK)/bin/rm
-OBJCOPY	= $(XSDK)/bin/human68k-objcopy
+ELF2X68K = $(XSDK)/bin/elf2x68k
 STRIP = $(XSDK)/bin/stripx
 CFLAGS = -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments
+LDFLAGS = -Wl,--no-warn-rwx-segments
 LIBS = -ldos -liocs -lbas -lc -lfloatfnc
 
-all: SPLOAD.X SPSAVE.X
+all: SPLOAD SPSAVE
 
 spload.o : main.c
 	$(CC) $(CFLAGS) -o $@ -c $<
@@ -19,15 +19,13 @@ spsave.o : main.c
 .s.o:
 	$(AS) -I$(XSDK)/human68k/include -quiet -Felf -o $@ $<
 
-SPLOAD.X: spload.o
+SPLOAD: spload.o
 	$(CC) $(LDFLAGS) -o $@ $< $(LIBS)
-	$(OBJCOPY) -O xfile $@ $@
-	$(STRIP) $@
+	$(ELF2X68K) $@ -s
 
-SPSAVE.X: spsave.o
+SPSAVE: spsave.o
 	$(CC) $(LDFLAGS) -o $@ $< $(LIBS)
-	$(OBJCOPY) -O xfile $@ $@
-	$(STRIP) $@
+	$(ELF2X68K) $@ -s
 
 clean:
-	-$(RM) spload.o spsave.o
+	-$(RM) spload.o spsave.o SPLOAD SPSAVE

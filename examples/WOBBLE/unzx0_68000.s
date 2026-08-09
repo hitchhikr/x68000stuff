@@ -7,10 +7,10 @@ _start:
                     moveq   #-1,d2
 .literals:      
                     bsr.b   .get_elias
-                    subq.l  #1,d0
 .copy_lits:     
                     move.b  (a0)+,(a6)+
-                    dbf     d0,.copy_lits
+                    subq.l  #1,d0
+                    bgt.b   .copy_lits
                     add.b   d1,d1
                     bcs.b   .get_offset
 .rep_match:     

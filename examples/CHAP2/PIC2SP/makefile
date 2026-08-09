@@ -4,10 +4,10 @@ endif
 CC = $(XSDK)/bin/human68k-gcc
 AS = $(XSDK)/bin/vasm
 RM = $(XSDK)/bin/rm
-OBJCOPY	= $(XSDK)/bin/human68k-objcopy
+ELF2X68K = $(XSDK)/bin/elf2x68k
 STRIP = $(XSDK)/bin/stripx
 CFLAGS = -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments
+LDFLAGS = -Wl,--no-warn-rwx-segments
 LIBS = -ldos -liocs -lbas -lc -lfloatfnc
 
 .c.o:
@@ -17,12 +17,11 @@ LIBS = -ldos -liocs -lbas -lc -lfloatfnc
 
 files = pic2sp.o main.o display.o
 
-all: PIC2SP.X
+all: PIC2SP
 
-PIC2SP.X: $(files)
+PIC2SP: $(files)
 	$(CC) $(LDFLAGS) -o $@ $(files) $(LIBS)
-	$(OBJCOPY) -O xfile $@ $@
-	$(STRIP) $@
+	$(ELF2X68K) $@ -s
 
 clean:
-	-$(RM) $(files)
+	-$(RM) $(files) PIC2SP

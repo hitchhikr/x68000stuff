@@ -5,7 +5,7 @@
 ;*
 ;*  Base address 000000
 ;*  Exec address 000000
-;*  Text size    0000c6 bytes
+;*  Text size    0000c8 bytes
 ;*  Data size    000000 byte(s)
 ;*  Bss  size    000000 byte(s)
 ;*  3 Labels
@@ -15,7 +15,7 @@
 ;*********************************************
     mc68000
     opt o+
-    opt all+
+    opt a+
 
 	include	doscalls.inc
 	include	iocscalls.inc

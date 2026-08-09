@@ -4,10 +4,10 @@ endif
 CC = $(XSDK)/bin/human68k-gcc
 AS = $(XSDK)/bin/vasm
 RM = $(XSDK)/bin/rm
-OBJCOPY	= $(XSDK)/bin/human68k-objcopy
+ELF2X68K = $(XSDK)/bin/elf2x68k
 STRIP = $(XSDK)/bin/stripx
 CFLAGS = -w -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments
+LDFLAGS = -Wl,--no-warn-rwx-segments
 LIBS = -ldos -liocs -lbas -lc -lfloatfnc
 
 .c.o:
@@ -18,12 +18,11 @@ LIBS = -ldos -liocs -lbas -lc -lfloatfnc
 files = main.o basic.o bind.o buffer.o display.o file.o fileio.o line.o random.o region.o search.o \
         spawn.o termio.o window.o word.o exec.o input.o kanji.o wildcard.o system.o hprint.o
 
-all: ME.X
+all: ME
 
-ME.X: $(files)
+ME: $(files)
 	$(CC) $(LDFLAGS) -O -o ../$@ $(files) $(LIBS)
-	$(OBJCOPY) -O xfile ../$@ ../$@
-	$(STRIP) ../$@
+	$(ELF2X68K) ../$@ -s
 
 clean:
-	-$(RM) $(files)
+	-$(RM) $(files) ../ME

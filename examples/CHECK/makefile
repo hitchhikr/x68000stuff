@@ -7,7 +7,7 @@ RM = $(XSDK)/bin/rm
 OBJCOPY	= $(XSDK)/bin/human68k-objcopy
 STRIP = $(XSDK)/bin/stripx
 CFLAGS = -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments -nostartfiles
+LDFLAGS = -Wl,--no-warn-rwx-segments -nostartfiles
 LIBS = 
 
 .c.o:
@@ -17,11 +17,11 @@ LIBS =
 
 files = main.o
 
-all: CHECK.R
+all: CHECK
 
-CHECK.R: $(files)
+CHECK: $(files)
 	$(CC) $(LDFLAGS) -o $@ $(files) $(LIBS)
-	$(OBJCOPY) -O binary $@ $@
+	$(OBJCOPY) -O binary $@ $@.R
 
 clean:
-	-$(RM) $(files)
+	-$(RM) $(files) CHECK

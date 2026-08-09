@@ -17,7 +17,7 @@ void	vdisp2( void )
 }
 void	usage( void )
 {
-	fputs( "Usage:kbd_mode.x [ n [ m ] ]\n", stdout );
+	fputs( "Usage:kbdmode.x [ n [ m ] ]\n", stdout );
 	fputs( "\tn: Delay time at the start of repeat ( 200 + n * 100 [msec] )\n", stdout );
 	fputs( "\tm: Subsequent repeat interval time ( 30 + m * 5 [msec] )\n", stdout );
 	exit( 1 );
@@ -31,7 +31,7 @@ void	main( int argc, char **argv )
 	fputs( "X68k Keyboard auto repeat speed changer by chika@kmc\n", stdout );
 
     B_SUPER( 0 );
-	if( argc >=4 || ( argc > 1 && argv[ 1 ][ 0 ] == '-' ) ) usage();
+	if( argc >= 4 || ( argc > 1 && argv[ 1 ][ 0 ] == '-' ) ) usage();
 
 	for( i = 1 ; i < argc; i++ ) {
 		arg[ i - 1 ] = atoi( argv[ i ] );

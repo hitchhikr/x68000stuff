@@ -2,7 +2,7 @@
 
     mc68000
     opt o+
-    opt all+
+    opt a+
 
 	include	iocscalls.inc
 	include	doscalls.inc

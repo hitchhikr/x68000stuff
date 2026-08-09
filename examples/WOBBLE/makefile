@@ -8,7 +8,7 @@ OBJCOPY	= $(XSDK)/bin/human68k-objcopy
 STRIP = $(XSDK)/bin/stripx
 PACKER = $(XSDK)/bin/salvador
 CFLAGS = -Ofast -Wno-multichar -fomit-frame-pointer -fstrength-reduce -fforce-addr -fcall-used-d2 -fcall-used-a2
-LDFLAGS = -s -Wl,--no-warn-rwx-segments -nostartfiles
+LDFLAGS = -Wl,--no-warn-rwx-segments -nostartfiles
 LIBS = 
 
 .c.o:

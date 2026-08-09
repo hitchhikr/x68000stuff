@@ -3,6 +3,9 @@
 ; A 512 bytes intro written by hitchhikr/Rebels
 ; =======================================================
 
+                        opt     o+
+                        opt     a+
+
 ; =======================================================
 _CRTMOD                 equ     $10                             ; Set Screen Attributes
 _VDISPST                equ     $6c                             ; De/Install a vblank interrupt handler
