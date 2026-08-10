@@ -43,14 +43,14 @@ COPPERLINES             equ     51
                         xdef    _start
 _start:
                 IFD EXIT
-                        lea     start(pc),a6
+                        lea     _start(pc),a6
                 ENDC
 
                         clr.l   -(a7)
                         DOS     _SUPER
 
                 IFD EXIT
-                        move.b  MFP_IERB,old_MFP_IERB-start(a6)
+                        move.b  MFP_IERB,old_MFP_IERB-_start(a6)
                 ENDC
 
                         moveq   #3,d1                          ; 256x240 16 colors 15 Khz ~60hz
