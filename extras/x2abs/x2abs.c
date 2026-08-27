@@ -1,4 +1,4 @@
-// Convert an X68000 relocatable executable file to absolute address binary blob
+// Convert an X68000 relocatable executable file (.x) to absolute address binary blob or .z executable
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,6 +27,17 @@ struct x68_x_header
 	unsigned int bindlist;	        // bind list offset
 } __attribute__((packed));          // 64/0x40 bytes
 
+struct x68_z_header
+{
+	unsigned short magic;           // 0x601a
+	unsigned int code;
+	unsigned int data;
+	unsigned int bss;
+	unsigned char reserved[8];
+	unsigned int base;
+	unsigned short padding;
+} __attribute__((packed));          // 28/0x1c bytes
+
 unsigned int get_dword(unsigned int data)
 {
 #if defined(BIG_ENDIAN)
@@ -48,9 +59,11 @@ int main(int argc, char *argv[])
     unsigned char *code_data_mem;
     unsigned char *reloc_mem;
     unsigned int base_address;
-    struct x68_x_header *header;
+    struct x68_x_header *x_header;
+    struct x68_z_header z_header;
     int reloc_data;
     int reloc_offset;
+    int gen_z = 0;
     unsigned int reloc_orig;
     int code_size;
     int data_size;
@@ -58,16 +71,20 @@ int main(int argc, char *argv[])
     int reloc_size;
     int symbol_size;
 
-    if(argc == 4)
+    if((argc == 4) || (argc == 5))
     {
-        base_address = strtoul(argv[1], &end, 16);
-        if(argv[1] == end)
+        if(argv[1][0] == '-' && (argv[1][1] == 'z' || argv[1][1] == 'Z'))
+        {
+            gen_z = 1;
+        }
+        base_address = strtoul(argv[1 + gen_z], &end, 16);
+        if(argv[1 + gen_z] == end)
         {
             fprintf(stderr, "Error: wrong relocation address\n");
             return EXIT_FAILURE;
         }
         
-        in = fopen(argv[2], "rb");
+        in = fopen(argv[2 + gen_z], "rb");
         if(in)
         {
             fseek(in, 0, SEEK_END);
@@ -80,13 +97,13 @@ int main(int argc, char *argv[])
                 fclose(in);
                 if(in_mem[0] == 'H' && in_mem[1] == 'U')
                 {
-                    header = (struct x68_x_header *) in_mem;
-                    printf("\n  Code size: 0x%x\n", get_dword(header->size[CODE_SIZE]));
-                    printf("  Data size: 0x%x\n", get_dword(header->size[DATA_SIZE]));
-                    printf("   Bss size: 0x%x\n", get_dword(header->size[BSS_SIZE]));
-                    printf(" Reloc size: 0x%x\n", get_dword(header->size[RELOC_SIZE]));
-                    printf("Entry point: 0x%x\n\n", get_dword(header->entrypoint));
-                    out = fopen(argv[3], "wb");
+                    x_header = (struct x68_x_header *) in_mem;
+                    printf("\n  Code size: 0x%x\n", get_dword(x_header->size[CODE_SIZE]));
+                    printf("  Data size: 0x%x\n", get_dword(x_header->size[DATA_SIZE]));
+                    printf("   Bss size: 0x%x\n", get_dword(x_header->size[BSS_SIZE]));
+                    printf(" Reloc size: 0x%x\n", get_dword(x_header->size[RELOC_SIZE]));
+                    printf("Entry point: 0x%x\n\n", get_dword(x_header->entrypoint));
+                    out = fopen(argv[3 + gen_z], "wb");
                     if(out)
                     {
                         code_size = (in_mem[12] << 24) | (in_mem[12 + 1] << 16) | (in_mem[12 + 2] << 8) | (in_mem[12 + 3]);
@@ -120,24 +137,47 @@ int main(int argc, char *argv[])
                             code_data_mem[reloc_offset + 3] = reloc_orig & 0xff;
                             i += 2;
                         }
-                        
+                        if(gen_z)
+                        {
+                            // Write .z header
+                            memset(&z_header, 0, sizeof(z_header));
+#if defined(BIG_ENDIAN)
+                            z_header.magic = 0x601a;
+#else
+                            z_header.magic = 0x1a60;
+#endif
+                            z_header.code = x_header->size[CODE_SIZE];
+                            z_header.data = x_header->size[DATA_SIZE];
+                            z_header.bss = x_header->size[BSS_SIZE];
+                            z_header.base = get_dword(base_address);
+                            z_header.padding = 0xffff;
+                            fwrite(&z_header, 1, sizeof(z_header), out);
+                        }
                         // Write code section
                         fwrite(&in_mem[64], 1, code_size, out);
                         // Write data section
                         fwrite(&in_mem[64 + code_size], 1, data_size, out);
-                        bss_mem = malloc(bss_size);
-                        if(bss_mem)
+                        if(gen_z)
                         {
-                            memset(bss_mem, 0, bss_size);
-                            fwrite(bss_mem, 1, bss_size, out);
                             fclose(out);
-                            printf("Relocated %s into %s at 0x%x\n", argv[2], argv[3], base_address);
+                            printf("Relocated %s into %s (.Z) at 0x%x\n", argv[2 + gen_z], argv[3 + gen_z], base_address);
                         }
                         else
                         {
-                            fclose(out);
-                            fprintf(stderr, "Error: not enough memory\n");
-                            return EXIT_FAILURE;
+                            bss_mem = malloc(bss_size);
+                            if(bss_mem)
+                            {
+                                memset(bss_mem, 0, bss_size);
+                                fwrite(bss_mem, 1, bss_size, out);
+                                fclose(out);
+                                printf("Relocated %s into %s (RAW) at 0x%x\n", argv[2 + gen_z], argv[3 + gen_z], base_address);
+                            }
+                            else
+                            {
+                                fclose(out);
+                                fprintf(stderr, "Error: not enough memory\n");
+                                return EXIT_FAILURE;
+                            }
                         }
                     }
                     else
@@ -167,7 +207,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("usage: x2raw <relocation address in hex> <infile.x> <outfile.raw>\n");
+        printf("usage: x2abs [-z] <relocation address in hex> <infile.x> <outfile>\n");
     }
     return EXIT_SUCCESS;
 }

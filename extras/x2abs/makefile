@@ -6,10 +6,10 @@ LDFLAGS	= -s
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
-files = x2bin.o
+files = x2abs.o
 
-x2bin: $(files)
-	$(CC) -o x2bin $(files) $(LDFLAGS)
+x2abs: $(files)
+	$(CC) -o x2abs $(files) $(LDFLAGS)
 
 clean:
 	-rm $(files)

@@ -838,8 +838,9 @@ EXT_AREA_SET_REG_4  equ     $EAFF89         ; 1.b                            4($
 ; The multi-function peripheral MC68901 is a 4 timer, 1 channel serial
 ; Alport (USART) has an 8-bit general-purpose I/O port (GPIP).
 ; The allocation for X680x0/Human68k is as follows:
+;
 ; - Timer A Interrupt by V-DISP (vertical display period) signal
-; - Timer B Serial port clock generation
+; - Timer B Serial port clock generation (USART/Keyboard)
 ; - Timer C Cursor blinking/FDD control, etc. interrupt
 ; - Timer D BG Interrupt for process switching
 ; - Serial port keyboard input/output
